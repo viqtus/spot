@@ -19,6 +19,16 @@ var game = {
 		}
 	},
 
+	check:
+	{
+		cache: function(id) {
+			var cache = (game.cache[id]) ? game.cache[id] : 'cache';
+			var frame = (game.scene[id]) ? game.scene[id] : 'frame';
+			var draw = ((frame.hash != cache.hash) || (game.event.resize));
+			return draw;
+		}
+	},
+
 	create: {
 		set area(json) {
 			var area = {};
@@ -39,12 +49,12 @@ var game = {
 	},
 
 	draw: {
-		set image(json) {
+		set rectangle(json) {
 			var frame = {};
 				frame.clear = (json.clear) ? json.clear : false;
+				frame.color = json.color;
 				frame.h = json.h;
 				frame.id = json.id;
-				frame.image = json.image;
 				frame.w = json.w;
 				frame.x = json.x;
 				frame.y = json.y;
@@ -56,7 +66,8 @@ var game = {
 					if(frame.clear) {
 						context.clearRect(frame.x, frame.y, frame.w, frame.h);
 					};
-					context.drawImage(frame.image, frame.x, frame.y, frame.w, frame.h);
+					context.fillStyle = frame.color;
+					context.fillRect(frame.x, frame.y, frame.w, frame.h);
 				};
 
 			game.scene[frame.id] = frame;
@@ -67,11 +78,9 @@ var game = {
 		if(game.cache)
 		{
 			for(var id in game.scene) {
-				var cache = (game.cache[id]) ? game.cache[id] : 'cache';
-				var frame = (game.scene[id]) ? game.scene[id] : 'frame';
-				if((frame.hash != cache.hash) || (game.event.resize)) {
+				if(game.check.cache(id)) {
 					window.console.log('draw');
-					frame.draw(game.canvas[frame.z].context);
+					game.scene[id].draw(game.canvas[game.scene[id].z].context);
 				};
 			};
 		};
@@ -141,6 +150,14 @@ var game = {
 
 	updating: function() {
 		game.canvas.resize();
+		game.draw.rectangle = {
+			x: game.event.x,
+			y: game.event.y,
+			h: 10,
+			w: 10,
+			color: '#223355',
+			id: 'pixel'
+		};
 	}
 };
 
