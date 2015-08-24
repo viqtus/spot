@@ -105,12 +105,27 @@ var game = {
 		y: undefined
 	},
 
-	scene: [],
+	load: {
+		set audio(json) {
+			for(var id in json) {
+				var audio = new Audio(json[id]);
+				game.audio[id] = audio;
+			};
+		}
+	},
 
 	map: {},
 
 	option: {
-		tick: 50
+		tick: 50,
+		volume: 0.5
+	},
+
+	play: function(audio, volume, loop) {
+		audio.currentTime = 0;
+		audio.loop = (loop) ? true : false;
+		audio.volume = (volume) ? volume * game.option.volume : game.option.volume;
+		audio.play();
 	},
 
 	preloading: function() {
@@ -118,12 +133,17 @@ var game = {
 		game.create.canvas('hud', 10);
 		game.canvas.resize(true);
 
+		game.load.audio = {
+			tap: 'res/tap.ogg'
+		};
+
 		window.onload = function() {
 			game.event.listener(event);
 		};
 
 		window.onmousedown = function() {
 			game.event.listener(event);
+			game.play(game.audio.tap, 1, false);
 		};
 
 		window.onmouseup = function() {
@@ -146,7 +166,7 @@ var game = {
 		game.drawing();
 	},
 
-	hash: undefined,
+	scene: [],
 
 	updating: function() {
 		game.canvas.resize();
