@@ -51,12 +51,13 @@ var game = {
 
 		set button(json) {
 			var button = {};
+				button.audio = (json.audio) ? json.audio : game.audio.tap;
 				button.color = json.color;
 				button.mousedown = function() {
 					if(game.event.mousedown) {
 						if(game.event.mouseover(button)) {
 							window.console.log(json.id);
-							game.play(game.audio.tap, 1, false);
+							game.play(button.audio, 0.1, false);
 						};
 					};
 				};
@@ -155,8 +156,29 @@ var game = {
 
 	interface: {
 		hud: function() {
+			var x, y, h, w;
+			h = game.canvas.s8;
+			w = game.canvas.s8;
+
+			x = game.canvas.w2 - game.canvas.w32 - game.canvas.w64 - 2*w;
+			y = game.canvas.h1 - h - game.canvas.h64;
 			game.object.button.fight.mousedown();
-			game.object.button.fight.draw(game.canvas.w64, game.canvas.h64, game.canvas.s8, game.canvas.s8);
+			game.object.button.fight.draw(x, y, h, w);
+
+			x = game.canvas.w2 - game.canvas.w64 - w;
+			y = game.canvas.h1 - game.canvas.h64 - h;
+			game.object.button.craft.mousedown();
+			game.object.button.craft.draw(x, y, h, w);
+
+			x = game.canvas.w2 + game.canvas.w64;
+			y = game.canvas.h1 - game.canvas.h64 - h;
+			game.object.button.chest.mousedown();
+			game.object.button.chest.draw(x, y, h, w);
+
+			x = game.canvas.w2 + game.canvas.w32 + game.canvas.w64 + w;
+			y = game.canvas.h1 - h - game.canvas.h64;
+			game.object.button.upgrade.mousedown();
+			game.object.button.upgrade.draw(x, y, h, w);
 		}
 	},
 
@@ -172,7 +194,22 @@ var game = {
 	map: {},
 
 	object: {
-		button: {}
+		button: {},
+		set creator(json) {
+			for(var type in json) {
+				switch(type) {
+					case 'button':
+						for(var id in json[type]) {
+							game.create.button = {
+								audio: json[type][id].audio,
+								color: json[type][id].color,
+								id: id
+							};
+						};
+						break;
+				};
+			};
+		}
 	},
 
 	option: {
@@ -194,12 +231,29 @@ var game = {
 		game.canvas.resize(true);
 
 		game.load.audio = {
+			sword: 'res/sword.ogg',
 			tap: 'res/tap.ogg'
 		};
 
-		game.create.button = {
-			color: '#dd5671',
-			id: 'fight'
+		game.object.creator = {
+			button: {
+				chest: {
+					audio: game.audio.sword,
+					color: '#AEC63A'
+				},
+				craft: {
+					audio: game.audio.sword,
+					color: '#FFDD3A'
+				},
+				fight: {
+					audio: game.audio.sword,
+					color: '#DB6048'
+				},
+				upgrade: {
+					audio: game.audio.sword,
+					color: '#559FDD'
+				}
+			}
 		};
 
 		window.onload = function() {
