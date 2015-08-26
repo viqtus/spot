@@ -15,6 +15,15 @@ var game = {
 						game.canvas[id].width = window.innerWidth;
 					};
 				};
+
+				var h = window.innerHeight;
+				var w = window.innerWidth;
+				for(var i = 0; i < game.option.quantum; i++) {
+					var n = Math.pow(2, i);
+					game.canvas['h' + n] = Math.floor(h/n);
+					game.canvas['w' + n] = Math.floor(w/n);
+					game.canvas['s' + n] = (h < w) ? game.canvas['h' + n] : game.canvas['w' + n];
+				};
 			};
 		}
 	},
@@ -38,6 +47,31 @@ var game = {
 			game.map[area.id] = area;
 			game.map[area.x] = (game.map[area.x]) ? game.map[area.x] : {};
 			game.map[area.x][area.y] = area;
+		},
+
+		set button(json) {
+			var button = {};
+				button.color = json.color;
+				button.down = function() {
+					window.console.log(json.id);
+				};
+				button.draw = function(x, y, h, w) {
+					button.x = x;
+					button.y = y;
+					button.h = h;
+					button.w = w;
+					game.draw.rectangle = {
+						x: x,
+						y: y,
+						z: 'hud',
+						h: h,
+						w: w,
+						color: button.color,
+						id: button.id
+					};
+				};
+				button.id = json.id;
+			game.object.button[button.id] = button;
 		},
 
 		canvas: function(id, layer) {
@@ -116,7 +150,12 @@ var game = {
 
 	map: {},
 
+	object: {
+		button: {}
+	},
+
 	option: {
+		quantum: 8,
 		tick: 50,
 		volume: 0.5
 	},
@@ -135,6 +174,11 @@ var game = {
 
 		game.load.audio = {
 			tap: 'res/tap.ogg'
+		};
+
+		game.create.button = {
+			color: '#dd5671',
+			id: 'fight'
 		};
 
 		window.onload = function() {
@@ -170,14 +214,7 @@ var game = {
 
 	updating: function() {
 		game.canvas.resize();
-		game.draw.rectangle = {
-			x: game.event.x,
-			y: game.event.y,
-			h: 10,
-			w: 10,
-			color: '#223355',
-			id: 'pixel'
-		};
+		game.object.button.fight.draw(game.canvas.w64, game.canvas.h64, game.canvas.s8, game.canvas.s8);
 	}
 };
 
