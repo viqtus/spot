@@ -52,8 +52,13 @@ var game = {
 		set button(json) {
 			var button = {};
 				button.color = json.color;
-				button.down = function() {
-					window.console.log(json.id);
+				button.mousedown = function() {
+					if(game.event.mousedown) {
+						if(game.event.mouseover(button)) {
+							window.console.log(json.id);
+							game.play(game.audio.tap, 1, false);
+						};
+					};
 				};
 				button.draw = function(x, y, h, w) {
 					button.x = x;
@@ -132,11 +137,27 @@ var game = {
 		},
 		load: false,
 		mousedown: false,
+		mouseover: function(object) {
+			var over = false;
+			if((game.event.x >= object.x) && (game.event.x <= object.x + object.w)) {
+				if((game.event.y >= object.y) && (game.event.y <= object.y + object.h)) {
+					over = true;
+				};
+			};
+			return over;
+		},
 		mouseup: false,
 		resize: false,
 		tick: false,
 		x: undefined,
 		y: undefined
+	},
+
+	interface: {
+		hud: function() {
+			game.object.button.fight.mousedown();
+			game.object.button.fight.draw(game.canvas.w64, game.canvas.h64, game.canvas.s8, game.canvas.s8);
+		}
 	},
 
 	load: {
@@ -187,7 +208,6 @@ var game = {
 
 		window.onmousedown = function() {
 			game.event.listener(event);
-			game.play(game.audio.tap, 1, false);
 		};
 
 		window.onmouseup = function() {
@@ -214,7 +234,7 @@ var game = {
 
 	updating: function() {
 		game.canvas.resize();
-		game.object.button.fight.draw(game.canvas.w64, game.canvas.h64, game.canvas.s8, game.canvas.s8);
+		game.interface.hud();
 	}
 };
 
