@@ -51,16 +51,9 @@ var game = {
 
 		set button(json) {
 			var button = {};
+				button.action = (json.action) ? json.action : function() { window.console.log(json.id); };
 				button.audio = (json.audio) ? json.audio : game.audio.tap;
 				button.color = json.color;
-				button.mousedown = function() {
-					if(game.event.mousedown) {
-						if(game.event.mouseover(button)) {
-							window.console.log(json.id);
-							game.play(button.audio, 0.1, false);
-						};
-					};
-				};
 				button.draw = function(x, y, h, w) {
 					button.x = x;
 					button.y = y;
@@ -77,7 +70,46 @@ var game = {
 					};
 				};
 				button.id = json.id;
+				button.mousedown = function() {
+					if(game.event.mousedown) {
+						if(game.event.mouseover(button)) {
+							button.action();
+							game.play(button.audio, 0.1, false);
+						};
+					};
+				};
 			game.object.button[button.id] = button;
+		},
+
+		set progress(json) {
+			var progress = {};
+				progress.color = json.color;
+				progress.current = 0;
+				progress.draw = function(x, y, h, w) {
+					progress.x = x;
+					progress.y = y;
+					progress.h = h;
+					progress.w = w;
+					game.draw.rectangle = {
+						x: x,
+						y: y,
+						z: 'hud',
+						h: h,
+						w: progress.W,
+						color: progress.color,
+						id: progress.id
+					};
+				};
+				progress.id = json.id;
+				progress.max = 1;
+				progress.tick = function(current, max) {
+					if(game.event.tick) {
+						progress.current = current;
+						progress.max = max;
+						progress.W = Math.floor(progress.w * progress.current / progress.max);
+					};
+				};
+			game.object.progress[progress.id] = progress;
 		},
 
 		canvas: function(id, layer) {
@@ -179,6 +211,13 @@ var game = {
 			y = game.canvas.h1 - h - game.canvas.h64;
 			game.object.button.upgrade.mousedown();
 			game.object.button.upgrade.draw(x, y, h, w);
+
+			x = 0;
+			y = 0;
+			h = game.canvas.h64;
+			w = game.canvas.w1;
+			game.object.progress.xp.tick(10, 100);
+			game.object.progress.xp.draw(x, y, h, w);
 		}
 	},
 
@@ -207,9 +246,18 @@ var game = {
 							};
 						};
 						break;
+					case 'progress':
+						for(var id in json[type]) {
+							game.create.progress = {
+								color: json[type][id].color,
+								id: id
+							};
+						};
+						break;
 				};
 			};
-		}
+		},
+		progress: {}
 	},
 
 	option: {
@@ -242,6 +290,9 @@ var game = {
 					color: '#AEC63A'
 				},
 				craft: {
+					action: function() {
+						game.progress.xp.current = 50;
+					},
 					audio: game.audio.sword,
 					color: '#FFDD3A'
 				},
@@ -252,6 +303,11 @@ var game = {
 				upgrade: {
 					audio: game.audio.sword,
 					color: '#559FDD'
+				}
+			},
+			progress: {
+				xp: {
+					color: '#FFDD3A'
 				}
 			}
 		};
