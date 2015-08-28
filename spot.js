@@ -192,6 +192,11 @@ var game = {
 			h = game.canvas.s8;
 			w = game.canvas.s8;
 
+			x = game.canvas.s64;
+			y = game.canvas.s32;
+			game.object.button.avatar.mousedown();
+			game.object.button.avatar.draw(x, y, h, w);
+
 			x = game.canvas.w2 - game.canvas.w32 - game.canvas.w64 - 2*w;
 			y = game.canvas.h1 - h - game.canvas.h64;
 			game.object.button.fight.mousedown();
@@ -212,9 +217,30 @@ var game = {
 			game.object.button.upgrade.mousedown();
 			game.object.button.upgrade.draw(x, y, h, w);
 
+			x = game.canvas.s8 + game.canvas.s32;
+			y = game.canvas.s32;
+			h = game.canvas.s64;
+			w = game.canvas.w1 - game.canvas.s8 - game.canvas.s32 - game.canvas.s64;
+			game.object.progress.hp.tick(100, 100);
+			game.object.progress.hp.draw(x, y, h, w);
+
+			x = game.canvas.s8 + game.canvas.s32;
+			y = game.canvas.s32 + game.canvas.s64;
+			h = game.canvas.s64;
+			w = game.canvas.w1 - game.canvas.s8 - game.canvas.s32 - game.canvas.s64;
+			game.object.progress.mp.tick(70, 100);
+			game.object.progress.mp.draw(x, y, h, w);
+
+			x = game.canvas.s8 + game.canvas.s32;
+			y = game.canvas.s16;
+			h = game.canvas.s64;
+			w = game.canvas.w1 - game.canvas.s8 - game.canvas.s32 - game.canvas.s64;
+			game.object.progress.sp.tick(90, 100);
+			game.object.progress.sp.draw(x, y, h, w);
+
 			x = 0;
 			y = 0;
-			h = game.canvas.h64;
+			h = game.canvas.s64;
 			w = game.canvas.w1;
 			game.object.progress.xp.tick(10, 100);
 			game.object.progress.xp.draw(x, y, h, w);
@@ -285,15 +311,19 @@ var game = {
 
 		game.object.creator = {
 			button: {
+				avatar: {
+					audio: game.audio.tap,
+					color: '#cccccc'
+				},
 				chest: {
-					audio: game.audio.sword,
+					audio: game.audio.tap,
 					color: '#AEC63A'
 				},
 				craft: {
 					action: function() {
 						game.progress.xp.current = 50;
 					},
-					audio: game.audio.sword,
+					audio: game.audio.tap,
 					color: '#FFDD3A'
 				},
 				fight: {
@@ -301,11 +331,20 @@ var game = {
 					color: '#DB6048'
 				},
 				upgrade: {
-					audio: game.audio.sword,
+					audio: game.audio.tap,
 					color: '#559FDD'
 				}
 			},
 			progress: {
+				hp: {
+					color: '#DB6048'
+				},
+				mp: {
+					color: '#559FDD'
+				},
+				sp: {
+					color: '#AEC63A'
+				},
 				xp: {
 					color: '#FFDD3A'
 				}
