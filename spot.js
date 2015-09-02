@@ -68,22 +68,18 @@ var game = {
 						color: button.color,
 						id: button.id
 					};
-					game.draw.pixel = {
-						color: {
-							0: '',
-							1: '#fff'
-						},
-						map: [
-							[0, 0, 1, 0, 0],
-							[0, 0, 1, 0, 0],
-							[0, 0, 1, 0, 0],
-							[0, 1, 1, 1, 0],
-							[0, 0, 1, 0, 0]
-						],
-						object: button
+					if(button.map) {
+						game.draw.pixel = {
+							color: {
+								0: '',
+								1: '#fff'
+							},
+							object: button
+						};
 					};
 				};
 				button.id = json.id;
+				button.map = json.map;
 				button.mousedown = function() {
 					if(game.event.mousedown) {
 						if(game.event.mouseover(button)) {
@@ -142,17 +138,17 @@ var game = {
 		set pixel(json) {
 			var pixel = {};
 				pixel.color = json.color;
-				pixel.h = json.map.length;
+				pixel.h = (json.object.map.length % 2 == 0) ? json.object.map.length - 1 : json.object.map.length;
 				pixel.id = json.id;
-				pixel.map = json.map;
+				pixel.map = json.object.map;
 				pixel.object = json.object;
-				pixel.w = json.map[0].length;
+				pixel.w = pixel.h;
 				pixel.z = json.object.z;
 				for(var i = 0; i < pixel.w; i++) {
 					for(var j = 0; j < pixel.h; j++) {
-						if(pixel.color[pixel.map[i][j]] != 0)
+						if(pixel.color[pixel.object.map[i][j]] != 0)
 						{
-							var color = pixel.color[pixel.map[i][j]];
+							var color = pixel.color[pixel.object.map[i][j]];
 							var h = Math.floor(pixel.object.h / pixel.h);
 							var id = pixel.object.id + '_' + i + '_' + j;
 							var w = Math.floor(pixel.object.w / pixel.w);
@@ -320,7 +316,8 @@ var game = {
 							game.create.button = {
 								audio: json[type][id].audio,
 								color: json[type][id].color,
-								id: id
+								id: id,
+								map: json[type][id].map
 							};
 						};
 						break;
@@ -365,26 +362,70 @@ var game = {
 			button: {
 				avatar: {
 					audio: game.audio.tap,
-					color: '#cccccc'
+					color: '#cccccc',
+					map: [
+						[0, 0, 1, 0, 0],
+						[0, 1, 1, 1, 0],
+						[0, 0, 1, 0, 0],
+						[0, 1, 1, 1, 0],
+						[0, 1, 1, 1, 0]
+					]
 				},
 				chest: {
 					audio: game.audio.tap,
-					color: '#AEC63A'
+					color: '#AEC63A',
+					map: [
+						[0, 0, 0, 0, 0, 0, 0, 0],
+						[0, 1, 1, 1, 1, 1, 1, 0],
+						[0, 1, 0, 0, 0, 0, 1, 0],
+						[0, 1, 1, 1, 1, 1, 1, 0],
+						[0, 1, 0, 1, 1, 0, 1, 0],
+						[0, 1, 0, 0, 0, 0, 1, 0],
+						[0, 1, 1, 1, 1, 1, 1, 0],
+						[0, 0, 0, 0, 0, 0, 0, 0]
+					]
 				},
 				craft: {
 					action: function() {
 						game.progress.xp.current = 50;
 					},
 					audio: game.audio.tap,
-					color: '#FFDD3A'
+					color: '#FFDD3A',
+					map: [
+						[0, 0, 0, 0, 0, 0, 0, 0],
+						[0, 1, 1, 1, 1, 1, 0, 0],
+						[0, 1, 1, 1, 1, 1, 1, 0],
+						[0, 0, 0, 1, 1, 0, 0, 0],
+						[0, 0, 0, 1, 1, 0, 0, 0],
+						[0, 0, 0, 1, 1, 0, 0, 0],
+						[0, 0, 0, 1, 1, 0, 0, 0],
+						[0, 0, 0, 0, 0, 0, 0, 0]
+					]
 				},
 				fight: {
 					audio: game.audio.sword,
-					color: '#DB6048'
+					color: '#DB6048',
+					map: [
+						[0, 0, 0, 0, 0, 0, 0, 0],
+						[0, 1, 0, 1, 1, 0, 1, 0],
+						[0, 1, 1, 1, 1, 1, 1, 0],
+						[0, 1, 1, 1, 1, 1, 1, 0],
+						[0, 1, 1, 1, 1, 1, 1, 0],
+						[0, 0, 1, 1, 1, 1, 0, 0],
+						[0, 0, 0, 1, 1, 0, 0, 0],
+						[0, 0, 0, 0, 0, 0, 0, 0]
+					]
 				},
 				upgrade: {
 					audio: game.audio.tap,
-					color: '#559FDD'
+					color: '#559FDD',
+					map: [
+						[0, 0, 0, 0, 0],
+						[0, 0, 1, 0, 0],
+						[0, 1, 1, 1, 0],
+						[0, 0, 1, 0, 0],
+						[0, 0, 0, 0, 0]
+					]
 				}
 			},
 			progress: {
