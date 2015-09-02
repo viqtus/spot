@@ -68,6 +68,20 @@ var game = {
 						color: button.color,
 						id: button.id
 					};
+					game.draw.pixel = {
+						color: {
+							0: '',
+							1: '#fff'
+						},
+						map: [
+							[0, 0, 1, 0, 0],
+							[0, 0, 1, 0, 0],
+							[0, 0, 1, 0, 0],
+							[0, 1, 1, 1, 0],
+							[0, 0, 1, 0, 0]
+						],
+						object: button
+					};
 				};
 				button.id = json.id;
 				button.mousedown = function() {
@@ -78,6 +92,7 @@ var game = {
 						};
 					};
 				};
+				button.z = 'hud';
 			game.object.button[button.id] = button;
 		},
 
@@ -104,11 +119,14 @@ var game = {
 				progress.max = 1;
 				progress.tick = function(current, max) {
 					if(game.event.tick) {
-						progress.current = current;
-						progress.max = max;
-						progress.W = Math.floor(progress.w * progress.current / progress.max);
+						if(progress.current != current) {
+							progress.current = current;
+							progress.max = max;
+							progress.W = Math.floor(progress.w * progress.current / progress.max);
+						};
 					};
 				};
+				progress.z = 'hud';
 			game.object.progress[progress.id] = progress;
 		},
 
@@ -121,6 +139,40 @@ var game = {
 	},
 
 	draw: {
+		set pixel(json) {
+			var pixel = {};
+				pixel.color = json.color;
+				pixel.h = json.map.length;
+				pixel.id = json.id;
+				pixel.map = json.map;
+				pixel.object = json.object;
+				pixel.w = json.map[0].length;
+				pixel.z = json.object.z;
+				for(var i = 0; i < pixel.w; i++) {
+					for(var j = 0; j < pixel.h; j++) {
+						if(pixel.color[pixel.map[i][j]] != 0)
+						{
+							var color = pixel.color[pixel.map[i][j]];
+							var h = Math.floor(pixel.object.h / pixel.h);
+							var id = pixel.object.id + '_' + i + '_' + j;
+							var w = Math.floor(pixel.object.w / pixel.w);
+							var x = pixel.object.x + j * w;
+							var y = pixel.object.y + i * h;
+							var z = pixel.object.z;
+
+							game.draw.rectangle = {
+								color: color,
+								h: h,
+								id: id,
+								w: w,
+								x: x,
+								y: y,
+								z: z
+							};
+						};
+					};
+				};
+		},
 		set rectangle(json) {
 			var frame = {};
 				frame.clear = (json.clear) ? json.clear : false;
@@ -218,21 +270,21 @@ var game = {
 			game.object.button.upgrade.draw(x, y, h, w);
 
 			x = game.canvas.s8 + game.canvas.s32;
-			y = game.canvas.s32;
+			y = 2 * game.canvas.s64;
 			h = game.canvas.s64;
 			w = game.canvas.w1 - game.canvas.s8 - game.canvas.s32 - game.canvas.s64;
 			game.object.progress.hp.tick(100, 100);
 			game.object.progress.hp.draw(x, y, h, w);
 
 			x = game.canvas.s8 + game.canvas.s32;
-			y = game.canvas.s32 + game.canvas.s64;
+			y = 3 * game.canvas.s64;
 			h = game.canvas.s64;
 			w = game.canvas.w1 - game.canvas.s8 - game.canvas.s32 - game.canvas.s64;
 			game.object.progress.mp.tick(70, 100);
 			game.object.progress.mp.draw(x, y, h, w);
 
 			x = game.canvas.s8 + game.canvas.s32;
-			y = game.canvas.s16;
+			y = 4 * game.canvas.s64;
 			h = game.canvas.s64;
 			w = game.canvas.w1 - game.canvas.s8 - game.canvas.s32 - game.canvas.s64;
 			game.object.progress.sp.tick(90, 100);
@@ -242,7 +294,7 @@ var game = {
 			y = 0;
 			h = game.canvas.s64;
 			w = game.canvas.w1;
-			game.object.progress.xp.tick(10, 100);
+			game.object.progress.xp.tick(80, 100);
 			game.object.progress.xp.draw(x, y, h, w);
 		}
 	},
